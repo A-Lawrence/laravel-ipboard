@@ -1,0 +1,21 @@
+{
+    "name": "alawrence/laravel-ipboardapi",
+    "description": "IPBoard API integration with Laravel",
+    "keywords": ["laravel", "ipboard", "restful", "api", "rest", "invision", "invision power", "forum", "board"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Anthony Lawrence",
+            "email": "artisan@anthonylawrence.me.uk"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "guzzlehttp/guzzle": "~4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Alawrence\\Ipboardapi\\": "src/"
+        }
+    }
+}
