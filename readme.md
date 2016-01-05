@@ -5,9 +5,9 @@
 [![Total Downloads](https://poser.pugx.org/alawrence/laravel-ipboardapi/d/total.png)](https://packagist.org/packages/A-Lawrence/laravel-ipboardapi)
 
 This package includes accessor methods for all common IPBoard API calls:
- - API Call 1
- - API Call 2
- - API Call 3
+ - Members
+ - Forum Posts
+ - Forum Topics
 
 ## Installation
 
@@ -93,3 +93,7 @@ $updateTopic = $ipboard->updateForumTopic(56, ["title" => "Removed title", "post
 
 $ipboard->deleteForumTopicById(567);
 ```
+
+## Contribution
+
+I appreciate there are elements of the API that haven't been implemented, as my license doesn't contain them.  If you wish to submit a PR I'll gladly accept.
