@@ -18,8 +18,7 @@ class TestCommand extends Command
 
     public function fire()
     {
-        $members = $this->ipboard->getMembersByPage();
-
+        print_r($this->ipboard->deleteMemberById(6389));
         exit();
         $result = $this->ipboard->hello();
 
