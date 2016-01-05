@@ -1,4 +1,4 @@
-<?php namespace Alawrence\IPBoardApi\Facades;
+<?php namespace Alawrence\Ipboard\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

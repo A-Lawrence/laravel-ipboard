@@ -45,6 +45,18 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->publishes([
             $this->getConfigPath() => config_path('ipboard.php'),
         ]);
+
+        \Validator::extend("is_csv_numeric", function($attribute, $value, $parameters, $validator){
+            return preg_match("/^[0-9,]+$/i", $value);
+        });
+
+        \Validator::extend("is_csv_alpha", function($attribute, $value, $parameters, $validator){
+            return preg_match("/^[A-Z,]+$/i", $value);
+        });
+
+        \Validator::extend("is_csv_alphanumeric", function($attribute, $value, $parameters, $validator){
+            return preg_match("/^[0-9A-Z,]+$/i", $value);
+        });
     }
 
     /**
