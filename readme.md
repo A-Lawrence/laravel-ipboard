@@ -14,7 +14,7 @@ This package includes accessor methods for all common IPBoard API calls:
 Require this package with composer:
 
 ```
-composer require alawrence/laravel-ipboardapi
+composer require alawrence/laravel-ipboard
 ```
 
 After updating composer, add this package's ServiceProvider to the providers array in config/app.php
