@@ -28,7 +28,7 @@ Alawrence\Ipboard\ServiceProvider::class,
 
 Facade:
 ```php
-'Ipboardapi' => Alawrence\Ipboard\Facade::class,
+'Ipboard' => Alawrence\Ipboard\Facade::class,
 ```
 
 In order to set the required variables for your instance of IPBoard, you must first publish the configuration files:
