@@ -1,5 +1,5 @@
 {
-    "name": "alawrence/laravel-ipboardapi",
+    "name": "alawrence/laravel-ipboard",
     "description": "IPBoard API integration with Laravel",
     "keywords": ["laravel", "ipboard", "restful", "api", "rest", "invision", "invision power", "forum", "board"],
     "license": "MIT",
@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Alawrence\\Ipboardapi\\": "src/"
+            "Alawrence\\Ipboard\\": "src/"
         }
     }
 }

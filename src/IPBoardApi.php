@@ -1,8 +1,8 @@
-<?php namespace Alawrence\IPBoardAPI;
+<?php namespace Alawrence\Ipboard;
 
 use GuzzleHttp\Client as HttpClient;
 
-class IPBoardAPI
+class Ipboard
 {
     protected $url;
     protected $key;
@@ -10,9 +10,9 @@ class IPBoardAPI
 
     public function __construct()
     {
-        $this->url = config("ipboardapi.api_url");
-        $this->key = config("ipboardapi.api_key");
-        $this->reference = config("ipboardapi.api_reference_name");
+        $this->url = config("ipboard.api_url");
+        $this->key = config("ipboard.api_key");
+        $this->reference = config("ipboard.api_reference_name");
     }
 
     public function make(){

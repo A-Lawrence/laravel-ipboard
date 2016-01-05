@@ -1,11 +1,11 @@
-<?php namespace Alawrence\IPBoardAPI\Console;
+<?php namespace Alawrence\Ipboard\Console;
 
-use Alawrence\IPBoardAPI\IPBoardAPI;
+use Alawrence\Ipboard\Ipboard;
 use Illuminate\Console\Command;
 
-class ClearCommand extends Command
+class TestCommand extends Command
 {
-    protected $name = 'ipboardapi:test';
+    protected $name = 'Ipboard:test';
     protected $description = 'Make a test call using the given API settings.';
 
     public function __construct()
@@ -15,6 +15,6 @@ class ClearCommand extends Command
 
     public function fire()
     {
-        //TODO: Make some test command here.
+        IPBoardAPI::basic();
     }
 }

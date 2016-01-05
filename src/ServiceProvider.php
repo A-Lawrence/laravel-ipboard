@@ -1,4 +1,4 @@
-<?php namespace Alawrence\IPBoardAPI;
+<?php namespace Alawrence\Ipboard;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
@@ -7,7 +7,11 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      *
      * @var bool
      */
-    protected $defer = true;
+    protected $defer = false;
+
+    private function getConfigPath(){
+        return __DIR__ . '/../config/ipboard.php';
+    }
 
     /**
      * Register the service provider.
@@ -16,18 +20,19 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     public function register()
     {
-        $configPath = __DIR__ . '/../config/ipboardapi.php';
-        $this->mergeConfigFrom($configPath, 'ipboardapi');
+        $this->mergeConfigFrom($this->getConfigPath(), 'ipboard');
 
-        $this->app->bind("ipboardapi", "Alawrence\IPBoardAPI\IPBoardAPI");
+        $this->app['ipboard'] = $this->app->share(function($app){
+            return new Ipboard();
+        });
 
-        $this->app['command.ipboardapi.test'] = $this->app->share(
+        $this->app['command.ipboard.test'] = $this->app->share(
             function ($app) {
-                return new Console\TestCommand($app['ipboardapi']);
+                return new Console\TestCommand($app['ipboard']);
             }
         );
 
-        $this->commands(array('command.ipboardapi.test'));
+        $this->commands(array('command.ipboard.test'));
     }
 
     /**
@@ -37,7 +42,9 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     public function boot()
     {
-        $this->package('alawrence/laravel-ipboardapi');
+        $this->publishes([
+            $this->getConfigPath() => config_path('ipboard.php'),
+        ]);
     }
 
     /**
@@ -47,6 +54,6 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     public function provides()
     {
-        return array('ipboardapi', 'command.ipboardapi.test');
+        return [];
     }
 }
