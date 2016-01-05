@@ -1,8 +1,8 @@
 ## Laravel IPBoard API
-[![Packagist License](https://poser.pugx.org/alawrence/laravel-ipboardapi/license.png)](http://choosealicense.com/licenses/mit/)
-[![Latest Stable Version](https://poser.pugx.org/alawrence/laravel-ipboardapi/version.png)](https://packagist.org/packages/A-Lawrence/laravel-ipboardapi)
-[![Latest Unstable Version](https://poser.pugx.org/alawrence/laravel-ipboardapi/v/unstable)](https://packagist.org/packages/A-Lawrence/laravel-ipboardapi)
-[![Total Downloads](https://poser.pugx.org/alawrence/laravel-ipboardapi/d/total.png)](https://packagist.org/packages/A-Lawrence/laravel-ipboardapi)
+[![Packagist License](https://poser.pugx.org/alawrence/laravel-ipboard/license.png)](http://choosealicense.com/licenses/mit/)
+[![Latest Stable Version](https://poser.pugx.org/alawrence/laravel-ipboard/version.png)](https://packagist.org/packages/A-Lawrence/laravel-ipboardapi)
+[![Latest Unstable Version](https://poser.pugx.org/alawrence/laravel-ipboard/v/unstable)](https://packagist.org/packages/A-Lawrence/laravel-ipboardapi)
+[![Total Downloads](https://poser.pugx.org/alawrence/laravel-ipboard/d/total.png)](https://packagist.org/packages/A-Lawrence/laravel-ipboardapi)
 
 This package includes accessor methods for all common IPBoard API calls:
  - Members
