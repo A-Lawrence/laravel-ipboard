@@ -15,11 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-<<<<<<< HEAD
-            "Alawrence\\Ipboardapi\\": "src/"
-=======
             "Alawrence\\Ipboard\\": "src/"
->>>>>>> develop
         }
     }
 }
