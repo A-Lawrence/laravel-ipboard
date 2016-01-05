@@ -2,6 +2,6 @@
 
 
 // Error 1C292/2
-class IpboardMemberIDInvalid extends \Exception {
+class IpboardMemberIdInvalid extends \Exception {
 
 }

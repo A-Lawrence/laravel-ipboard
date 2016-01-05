@@ -18,8 +18,6 @@ class TestCommand extends Command
 
     public function fire()
     {
-        print_r($this->ipboard->getForumPosts(["forums" => "123,123,123"]));
-        exit();
         $result = $this->ipboard->hello();
 
         if(array_get($result, "communityName", null)){
