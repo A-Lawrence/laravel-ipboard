@@ -29,6 +29,9 @@ class Ipboard
         "1C292/5" => Exceptions\IpboardMemberEmailExists::class,
         "1C292/6" => Exceptions\IpboardMemberInvalidGroup::class,
         "1C292/7" => Exceptions\IpboardMemberIDInvalid::class,
+
+        // forums/posts
+        "1F295/4" => Exceptions\IpboardForumPostIdInvalid::class,
     ];
 
     /**
@@ -171,6 +174,33 @@ class Ipboard
      */
     public function deleteMemberById($memberID){
         return $this->deleteRequest("core/members/".$memberID);
+    }
+
+    public function getForumPosts($searchCriteria){
+        $this->validateForumPostsSearchCriteria($searchCriteria);
+    }
+
+    private function validateForumPostsSearchCriteria($data){
+        if(is_comma_separated(array_get($data, "forums"))){
+            throw new Exceptions\InvalidFormat("Forums IDs must be separated by a comma.");
+        }
+    }
+
+    private function sanitizeForumPostsSearchCriteria($data){
+    }
+
+    /**
+     * Get a specific forum post given the ID.
+     *
+     * @param $postId The ID of the forum post to retrieve.
+     *
+     * @return mixed
+     * @throws Exceptions\IpboardInvalidApiKey
+     * @throws Exceptions\IpboardThrottled
+     * @throws Exceptions\IpboardMemberIdInvalid
+     */
+    public function getForumPostById($postId){
+        return $this->getRequest("forums/posts/".$postId);
     }
 
     /**
