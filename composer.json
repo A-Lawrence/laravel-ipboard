@@ -17,8 +17,8 @@
         "psr-4": {
             "Alawrence\\Ipboard\\": "src/"
         },
-        "files": {
+        "files": [
             "src/helpers.php"
-        }
+        ]
     }
 }
