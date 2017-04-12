@@ -22,7 +22,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
     {
         $this->mergeConfigFrom($this->getConfigPath(), 'ipboard');
 
-        $this->app['ipboard'] = $this->app->share(function($app){
+        $this->app['ipboard'] = $this->app->singleton("ipboard", function($app){
             return new Ipboard();
         });
 
@@ -42,10 +42,6 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     public function boot()
     {
-        $this->publishes([
-            $this->getConfigPath() => config_path('ipboard.php'),
-        ]);
-
         \Validator::extend("is_csv_numeric", function($attribute, $value, $parameters, $validator){
             return preg_match("/^[0-9,]+$/i", $value);
         });
