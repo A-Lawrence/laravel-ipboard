@@ -19,7 +19,7 @@ composer require alawrence/laravel-ipboard
 
 After updating composer, add this package's ServiceProvider to the providers array in config/app.php
 
-### Laravel 5.x:
+### < Laravel 5.4:
 
 ServiceProvider:
 ```php
