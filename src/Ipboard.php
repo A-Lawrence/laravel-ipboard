@@ -6,6 +6,8 @@ use Mockery\CountValidator\Exception;
 
 class Ipboard
 {
+    use Hello, Members, Posts, Topics;
+
     protected $url;
     protected $key;
     protected $reference;
@@ -71,488 +73,15 @@ class Ipboard
     }
 
     /**
-     * Call core/hello to find details of forum instance.
-     *
-     * @return string json return.
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     */
-    public function hello()
-    {
-        return $this->getRequest("core/hello");
-    }
-
-    /**
-     * Call to core/members to get a specific page of users.
-     *
-     * @param string $sortBy  Possible values are joined, name or ID (Default ID)
-     * @param string $sortDir Possible values are 'asc' and 'desc' (Default asc)
-     * @param int    $page    Any positive integer, up to the maximum number of pages.
-     *
-     * @return string json return.
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     */
-    public function getMembersByPage($sortBy = "ID", $sortDir = "asc", $page = 1)
-    {
-        return $this->getRequest("core/members",
-            ["query" => ["sortBy" => $sortBy, "sortDir" => $sortDir, "page" => $page]]);
-    }
-
-    /**
-     * Call to core/members to get all users in the database.
-     *
-     * @param string $sortBy  Possible values are joined, name or ID (Default ID)
-     * @param string $sortDir Possible values are 'asc' and 'desc' (Default asc)
-     *
-     * @return string json return.
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     */
-    public function getMembersAll($sortBy = "ID", $sortDir = "asc")
-    {
-        $allMembers = [];
-
-        $currentPage = 1;
-        do {
-            $response = $this->getMembersByPage($sortBy, $sortDir, $currentPage);
-            $allMembers = array_merge($allMembers, $response->results);
-            $currentPage++;
-        } while ($currentPage <= $response->totalPages);
-
-        return $allMembers;
-    }
-
-    /**
-     * Get a specific member details by their ID number.
-     *
-     * @param $memberID The ID number of the member to retrieve details for.
-     *
-     * @return string
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardMemberIdInvalid
-     */
-    public function getMemberById($memberID)
-    {
-        return $this->getRequest("core/members/" . $memberID);
-    }
-
-    /**
-     * Create a new member with the given information.
-     *
-     * @param $name     The display/username of the member to create.
-     * @param $email    The email address to associate with the member.
-     * @param $password The password to create the user account with.
-     * @param $group    The primary group to assign to the member (default = null, members)
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardMemberInvalidGroup
-     * @throws Exceptions\IpboardMemberUsernameExists
-     * @throws Exceptions\IpboardMemberEmailExists
-     */
-    public function createMember($name, $email, $password, $group = null)
-    {
-        return $this->postRequest("core/members", compact("name", "email", "password", "group"));
-    }
-
-    /**
-     * Update an existing member with the details provided.
-     *
-     * @param integer $memberID The member ID of the member to update.
-     * @param array   $data     Array of data (Allowed keys are name, email and password).
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardMemberIdInvalid
-     * @throws Exceptions\IpboardMemberInvalidGroup
-     * @throws Exceptions\IpboardMemberUsernameExists
-     * @throws Exceptions\IpboardMemberEmailExists
-     */
-    public function updateMember($memberID, array $data = [])
-    {
-        return $this->postRequest("core/members/" . $memberID, $data);
-    }
-
-    /**
-     * Delete a member with the given ID.
-     *
-     * @param integer $memberID The member ID of the member to delete.
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardMemberIdInvalid
-     */
-    public function deleteMemberById($memberID)
-    {
-        return $this->deleteRequest("core/members/" . $memberID);
-    }
-
-    /**
-     * Fetch all forum posts that match the given search criteria
-     *
-     * @param $searchCriteria The search criteria posts should match.
-     * @param $page           The page number to retrieve (default 1).
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
-     */
-    public function getForumPostsByPage($searchCriteria, $page = 1)
-    {
-        $validator = \Validator::make($searchCriteria, [
-            "forums"        => "string|is_csv_numeric",
-            "authors"       => "string|is_csv_numeric",
-            "hasBestAnswer" => "in:1,0",
-            "hasPoll"       => "in:1,0",
-            "locked"        => "in:1,0",
-            "hidden"        => "in:1,0",
-            "pinned"        => "in:1,0",
-            "featured"      => "in:1,0",
-            "archived"      => "in:1,0",
-            "sortBy"        => "in:id,date,title",
-            "sortDir"       => "in:asc,desc",
-        ], [
-            "is_csv_numeric" => "The :attribute must be a comma separated string of IDs.",
-        ]);
-
-        if ($validator->fails()) {
-            $message = head(array_flatten($validator->messages()));
-            throw new Exceptions\InvalidFormat($message);
-        }
-
-        return $this->getRequest("forums/posts", array_merge($searchCriteria, ["page" => $page]));
-    }
-
-    /**
-     * Fetch all forum posts that match the given search criteria
-     *
-     * @param $searchCriteria The search criteria posts should match.
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
-     */
-    public function getForumPostsAll($searchCriteria)
-    {
-        $allPosts = [];
-
-        $currentPage = 1;
-        do {
-            $response = $this->getForumPostsByPage($searchCriteria, $currentPage);
-            $allPosts = array_merge($allPosts, $response->results);
-            $currentPage++;
-        } while ($currentPage <= $response->totalPages);
-
-        return $allPosts;
-    }
-
-    /**
-     * Get a specific forum post given the ID.
-     *
-     * @param $postId The ID of the forum post to retrieve.
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardForumPostIdInvalid
-     */
-    public function getForumPostById($postId)
-    {
-        return $this->getRequest("forums/posts/" . $postId);
-    }
-
-    /**
-     * Create a forum post with the given data.
-     *
-     * @param integer $topicID  The ID of the topic to add the post to.
-     * @param integer $authorID The ID of the author for the post (if set to 0, author_name is used)
-     * @param stromg  $post     The HTML content of the post.
-     * @param array   $extra
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
-     * @throws Exceptions\IpboardMemberIdInvalid
-     * @throws Exceptions\IpboardForumTopicIdInvalid
-     * @throws Exceptions\IpboardPostInvalid
-     */
-    public function createForumPost($topicID, $authorID, $post, $extra = [])
-    {
-        $data = ["topic" => $topicID, "author" => $authorID, "post" => $post];
-        $data = array_merge($data, $extra);
-
-        $validator = \Validator::make($data, [
-            "topic"       => "required|numeric",
-            "author"      => "required|numeric",
-            "post"        => "required|string",
-            "author_name" => "required_if:author,0|string",
-            "date"        => "date_format:YYYY-mm-dd H:i:s",
-            "ip_address"  => "ip",
-            "hidden"      => "in:-1,0,1",
-        ]);
-
-        if ($validator->fails()) {
-            $message = head(array_flatten($validator->messages()));
-            throw new Exceptions\InvalidFormat($message);
-        }
-
-        return $this->postRequest("forums/posts", $data);
-    }
-
-    /**
-     * Update a forum post with the given ID.
-     *
-     * @param integer $postID The ID of the post to update.
-     * @param array   $data   The data to edit.
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
-     * @throws Exceptions\IpboardMemberIdInvalid
-     * @throws Exceptions\IpboardForumPostIdInvalid
-     * @throws Exceptions\IpboardPostInvalid
-     * @throws Exceptions\IpboardCannotHideFirstPost
-     * @throws Exceptions\IpboardCannotAuthorFirstPost
-     */
-    public function updateForumPost($postId, $data = [])
-    {
-        $validator = \Validator::make($data, [
-            "author"      => "numeric",
-            "author_name" => "required_if:author,0|string",
-            "post"        => "string",
-            "hidden"      => "in:-1,0,1",
-        ]);
-
-        if ($validator->fails()) {
-            $message = head(array_flatten($validator->messages()));
-            throw new Exceptions\InvalidFormat($message);
-        }
-
-        return $this->postRequest("forums/posts/" . $postId, $data);
-    }
-
-    /**
-     * Delete a forum post given it's ID.
-     *
-     * @param $postId The ID of the post to delete.
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardForumPostIdInvalid
-     * @throws Exceptions\IpboardCannotDeleteFirstPost
-     */
-    public function deleteForumPost($postId)
-    {
-        return $this->deleteRequest("forums/posts/" . $postId);
-    }
-
-    /**
-     * Fetch all forum topics that match the given search criteria
-     *
-     * @param $searchCriteria The search criteria topics should match.
-     * @param $page           The page number to retrieve (default 1).
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
-     */
-    public function getForumTopicsByPage($searchCriteria, $page = 1)
-    {
-        $validator = \Validator::make($searchCriteria, [
-            "forums"        => "string|is_csv_numeric",
-            "authors"       => "string|is_csv_numeric",
-            "hasBestAnswer" => "in:1,0",
-            "hasPoll"       => "in:1,0",
-            "locked"        => "in:1,0",
-            "hidden"        => "in:1,0",
-            "pinned"        => "in:1,0",
-            "featured"      => "in:1,0",
-            "archived"      => "in:1,0",
-            "sortBy"        => "in:id,date,title",
-            "sortDir"       => "in:asc,desc",
-        ], [
-            "is_csv_numeric" => "The :attribute must be a comma separated string of IDs.",
-        ]);
-
-        if ($validator->fails()) {
-            $message = head(array_flatten($validator->messages()));
-            throw new Exceptions\InvalidFormat($message);
-        }
-
-        return $this->getRequest("forums/topics", array_merge($searchCriteria, ["page" => $page]));
-    }
-
-    /**
-     * Fetch all forum topics that match the given search criteria
-     *
-     * @param $searchCriteria The search criteria topics should match.
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
-     */
-    public function getForumTopicsAll($searchCriteria)
-    {
-        $allTopics = [];
-
-        $currentPage = 1;
-        do {
-            $response = $this->getForumTopicsByPage($searchCriteria, $currentPage);
-            $allTopics = array_merge($allTopics, $response->results);
-            $currentPage++;
-        } while ($currentPage <= $response->totalPages);
-
-        return $allTopics;
-    }
-
-    /**
-     * Get a specific forum topic given the ID.
-     *
-     * @param $postId The ID of the forum topic to retrieve.
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardForumTopicIdInvalid
-     */
-    public function getForumTopicById($topicId)
-    {
-        return $this->getRequest("forums/topics/" . $topicId);
-    }
-
-    /**
-     * Create a forum topic with the given data.
-     *
-     * @param integer forumID  The ID of the forum to add the topic to.
-     * @param integer $authorID The ID of the author for the topic (if set to 0, author_name is used)
-     * @param string  $title    The title of the topic.
-     * @param string  $post     The HTML content of the post.
-     * @param array   $extra
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
-     * @throws Exceptions\IpboardForumIdInvalid
-     * @throws Exceptions\IpboardMemberIdInvalid
-     * @throws Exceptions\IpboardTopicTitleInvalid
-     * @throws Exceptions\IpboardPostInvalid
-     */
-    public function createForumTopic($forumID, $authorID, $title, $post, $extra = [])
-    {
-        $data = ["forum" => $forumID, "author" => $authorID, "title" => $title, "post" => $post];
-        $data = array_merge($data, $extra);
-
-        $validator = \Validator::make($data, [
-            "forum"       => "required|numeric",
-            "author"      => "required|numeric",
-            "title"       => "required|string",
-            "post"        => "required|string",
-            "author_name" => "required_if:author,0|string",
-            "prefix"      => "string",
-            "tags"        => "string|is_csv_alphanumeric",
-            "date"        => "date_format:YYYY-mm-dd H:i:s",
-            "ip_address"  => "ip",
-            "locked"      => "in:0,1",
-            "open_time"   => "date_format:YYYY-mm-dd H:i:s",
-            "close_time"  => "date_format:YYYY-mm-dd H:i:s",
-            "hidden"      => "in:-1,0,1",
-            "pinned"      => "in:0,1",
-            "featured"    => "in:0,1",
-        ], [
-            "is_csv_alphanumeric" => "The :attribute must be a comma separated string.",
-        ]);
-
-        if ($validator->fails()) {
-            $message = head(array_flatten($validator->messages()));
-            throw new Exceptions\InvalidFormat($message);
-        }
-
-        return $this->postRequest("forums/topics", $data);
-    }
-
-    /**
-     * Update a forum topic with the given ID.
-     *
-     * @param integer $topicID The ID of the topic to update.
-     * @param array   $data   The data to edit.
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
-     * @throws Exceptions\IpboardForumTopicIdInvalid
-     * @throws Exceptions\IpboardForumIdInvalid
-     * @throws Exceptions\IpboardMemberIdInvalid
-     */
-    public function updateForumTopic($topicID, $data = [])
-    {
-        $validator = \Validator::make($data, [
-            "forum" => "numeric",
-            "author"      => "numeric",
-            "author_name" => "required_if:author,0|string",
-            "title" => "string",
-            "post" => "string",
-            "prefix" => "string",
-            "tags"        => "string|is_csv_alphanumeric",
-            "date"        => "date_format:YYYY-mm-dd H:i:s",
-            "ip_address"  => "ip",
-            "locked"      => "in:0,1",
-            "open_time"   => "date_format:YYYY-mm-dd H:i:s",
-            "close_time"  => "date_format:YYYY-mm-dd H:i:s",
-            "hidden"      => "in:-1,0,1",
-            "pinned"      => "in:0,1",
-            "featured"    => "in:0,1",
-        ], [
-            "is_csv_alphanumeric" => "The :attribute must be a comma separated string.",
-        ]);
-
-        if ($validator->fails()) {
-            $message = head(array_flatten($validator->messages()));
-            throw new Exceptions\InvalidFormat($message);
-        }
-
-        return $this->postRequest("forums/topics/" . $topicID, $data);
-    }
-
-    /**
-     * Delete a forum topic given it's ID.
-     *
-     * @param $topicId The ID of the topic to delete.
-     *
-     * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardForumPostIdInvalid
-     * @throws Exceptions\IpboardCannotDeleteFirstPost
-     */
-    public function deleteForumTopic($topicId)
-    {
-        return $this->deleteRequest("forums/topics/" . $topicId);
-    }
-
-    /**
      * Perform a get request.
      *
      * @param       $function The endpoint to call via GET.
      * @param array $extra    Any query string parameters.
      *
      * @return string json return.
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardMemberIdInvalid
+     * @throws IpboardInvalidApiKey
+     * @throws IpboardThrottled
+     * @throws IpboardMemberIdInvalid
      */
     private function getRequest($function, $extra = [])
     {
@@ -566,12 +95,12 @@ class Ipboard
      * @param $data     The form data to be sent.
      *
      * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardMemberIdInvalid
-     * @throws Exceptions\IpboardMemberInvalidGroup
-     * @throws Exceptions\IpboardMemberUsernameExists
-     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws IpboardInvalidApiKey
+     * @throws IpboardThrottled
+     * @throws IpboardMemberIdInvalid
+     * @throws IpboardMemberInvalidGroup
+     * @throws IpboardMemberUsernameExists
+     * @throws IpboardMemberEmailExists
      */
     private function postRequest($function, $data)
     {
@@ -584,11 +113,11 @@ class Ipboard
      * @param $function The endpoint to perform a DELETE request on.
      *
      * @return mixed
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardMemberIdInvalid
+     * @throws IpboardInvalidApiKey
+     * @throws IpboardThrottled
+     * @throws IpboardMemberIdInvalid
      */
-    public function deleteRequest($function)
+    private function deleteRequest($function)
     {
         return $this->request("DELETE", $function);
     }
@@ -602,12 +131,12 @@ class Ipboard
      *
      * @return mixed
      * @throws \Exception
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardMemberIdInvalid
-     * @throws Exceptions\IpboardMemberInvalidGroup
-     * @throws Exceptions\IpboardMemberUsernameExists
-     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws IpboardInvalidApiKey
+     * @throws IpboardThrottled
+     * @throws IpboardMemberIdInvalid
+     * @throws IpboardMemberInvalidGroup
+     * @throws IpboardMemberUsernameExists
+     * @throws IpboardMemberEmailExists
      */
     private function request($method, $function, $extra = [])
     {
@@ -629,12 +158,12 @@ class Ipboard
      * @param $code The IPBoard error code.
      *
      * @throws \Exception
-     * @throws Exceptions\IpboardInvalidApiKey
-     * @throws Exceptions\IpboardThrottled
-     * @throws Exceptions\IpboardMemberIdInvalid
-     * @throws Exceptions\IpboardMemberInvalidGroup
-     * @throws Exceptions\IpboardMemberUsernameExists
-     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws IpboardInvalidApiKey
+     * @throws IpboardThrottled
+     * @throws IpboardMemberIdInvalid
+     * @throws IpboardMemberInvalidGroup
+     * @throws IpboardMemberUsernameExists
+     * @throws IpboardMemberEmailExists
      */
     private function handleError($response)
     {
