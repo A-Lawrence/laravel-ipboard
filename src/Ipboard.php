@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class Ipboard
 {
-    use Hello, Members, Posts, Topics;
+    use Hello, Members, Posts, Topics, Forums;
 
     protected $url;
     protected $key;
