@@ -19,7 +19,7 @@ trait Topics
      * Fetch all forum topics that match the given search criteria
      *
      * @param array $searchCriteria The search criteria topics should match.
-     * @param int   $page           The page number to retrieve (default 1).
+     * @param integer  $page           The page number to retrieve (default 1).
      *
      * @return mixed
      * @throws IpboardInvalidApiKey
@@ -55,7 +55,7 @@ trait Topics
     /**
      * Fetch all forum topics that match the given search criteria
      *
-     * @param int $searchCriteria The search criteria topics should match.
+     * @param integer $searchCriteria The search criteria topics should match.
      *
      * @return mixed
      * @throws IpboardInvalidApiKey
@@ -79,7 +79,7 @@ trait Topics
     /**
      * Get a specific forum topic given the ID.
      *
-     * @param int $topicId The ID of the forum topic to retrieve.
+     * @param integer $topicId The ID of the forum topic to retrieve.
      *
      * @return mixed
      * @throws IpboardInvalidApiKey
@@ -94,16 +94,29 @@ trait Topics
     /**
      * Get a specific forum topic given the ID.
      *
-     * @param int $topicId The ID of the forum topic to retrieve.
+     * @param integer $topicId The ID of the forum topic to retrieve.
+     * @param array $searchCriteria The search criteria posts should match.
+     * @param integer $page The page number to retrieve (default 1).
      *
      * @return mixed
      * @throws IpboardInvalidApiKey
      * @throws IpboardThrottled
      * @throws IpboardForumTopicIdInvalid
+     * @throws InvalidFormat
      */
-    public function getForumTopicPosts($topicId)
+    public function getForumTopicPosts($topicId, $searchCriteria = [], $page = 1)
     {
-        return $this->getRequest("forums/topics/" . $topicId . "/posts");
+        $validator = \Validator::make($searchCriteria, [
+            "hidden"        => "in:1,0",
+            "sortDir"       => "in:asc,desc",
+        ]);
+
+        if ($validator->fails()) {
+            $message = head(array_flatten($validator->messages()));
+            throw new InvalidFormat($message);
+        }
+
+        return $this->getRequest("forums/topics/" . $topicId . "/posts", array_merge($searchCriteria, ["page" => $page]));
     }
 
     /**

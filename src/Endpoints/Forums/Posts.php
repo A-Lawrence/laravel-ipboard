@@ -19,7 +19,7 @@ trait Posts
      * Fetch all forum posts that match the given search criteria
      *
      * @param array $searchCriteria The search criteria posts should match.
-     * @param int $page             The page number to retrieve (default 1).
+     * @param integer $page             The page number to retrieve (default 1).
      *
      * @return mixed
      * @throws IpboardInvalidApiKey

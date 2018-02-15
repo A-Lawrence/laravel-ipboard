@@ -1,5 +1,9 @@
 <?php namespace Alawrence\Ipboard;
 
+use Alawrence\Ipboard\Posts;
+use Alawrence\Ipboard\Topics;
+use Alawrence\Ipboard\Hello;
+use Alawrence\Ipboard\Members;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use Mockery\CountValidator\Exception;
@@ -85,7 +89,7 @@ class Ipboard
      */
     private function getRequest($function, $extra = [])
     {
-        return $this->request("GET", $function, $extra);
+        return $this->request("GET", $function, ["query" => $extra]);
     }
 
     /**

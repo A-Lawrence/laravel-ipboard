@@ -16,7 +16,7 @@ trait Members
      *
      * @param string $sortBy  Possible values are joined, name or ID (Default ID)
      * @param string $sortDir Possible values are 'asc' and 'desc' (Default asc)
-     * @param int    $page    Any positive integer, up to the maximum number of pages.
+     * @param integer   $page    Any positive integer, up to the maximum number of pages.
      *
      * @return string json return.
      * @throws IpboardInvalidApiKey
