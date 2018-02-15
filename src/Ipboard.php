@@ -1,12 +1,9 @@
 <?php namespace Alawrence\Ipboard;
 
-use Alawrence\Ipboard\Posts;
-use Alawrence\Ipboard\Topics;
-use Alawrence\Ipboard\Hello;
-use Alawrence\Ipboard\Members;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use Mockery\CountValidator\Exception;
+use Psr\Http\Message\ResponseInterface;
 
 class Ipboard
 {
@@ -79,13 +76,17 @@ class Ipboard
     /**
      * Perform a get request.
      *
-     * @param       $function The endpoint to call via GET.
-     * @param array $extra    Any query string parameters.
+     * @param string $function The endpoint to call via GET.
+     * @param array $extra Any query string parameters.
      *
      * @return string json return.
-     * @throws IpboardInvalidApiKey
-     * @throws IpboardThrottled
-     * @throws IpboardMemberIdInvalid
+     * @throws Exceptions\IpboardInvalidApiKey
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberIdInvalid
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
+     * @throws Exceptions\IpboardThrottled
+     * @throws \Exception
      */
     private function getRequest($function, $extra = [])
     {
@@ -95,16 +96,17 @@ class Ipboard
     /**
      * Perform a post request.
      *
-     * @param $function The endpoint to perform a POST request on.
-     * @param $data     The form data to be sent.
+     * @param string $function The endpoint to perform a POST request on.
+     * @param array $data The form data to be sent.
      *
      * @return mixed
-     * @throws IpboardInvalidApiKey
-     * @throws IpboardThrottled
-     * @throws IpboardMemberIdInvalid
-     * @throws IpboardMemberInvalidGroup
-     * @throws IpboardMemberUsernameExists
-     * @throws IpboardMemberEmailExists
+     * @throws Exceptions\IpboardInvalidApiKey
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberIdInvalid
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
+     * @throws Exceptions\IpboardThrottled
+     * @throws \Exception
      */
     private function postRequest($function, $data)
     {
@@ -114,12 +116,16 @@ class Ipboard
     /**
      * Perform a delete request.
      *
-     * @param $function The endpoint to perform a DELETE request on.
+     * @param string $function The endpoint to perform a DELETE request on.
      *
      * @return mixed
-     * @throws IpboardInvalidApiKey
-     * @throws IpboardThrottled
-     * @throws IpboardMemberIdInvalid
+     * @throws Exceptions\IpboardInvalidApiKey
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberIdInvalid
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
+     * @throws Exceptions\IpboardThrottled
+     * @throws \Exception
      */
     private function deleteRequest($function)
     {
@@ -129,18 +135,18 @@ class Ipboard
     /**
      * Perform the specified request.
      *
-     * @param       $method   Either GET, POST, PUT, DELETE, PATCH
-     * @param       $function The endpoint to call.
-     * @param array $extra    Any query string information.
+     * @param string $method Either GET, POST, PUT, DELETE, PATCH
+     * @param string $function The endpoint to call.
+     * @param array $extra Any query string information.
      *
      * @return mixed
+     * @throws Exceptions\IpboardInvalidApiKey
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberIdInvalid
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
+     * @throws Exceptions\IpboardThrottled
      * @throws \Exception
-     * @throws IpboardInvalidApiKey
-     * @throws IpboardThrottled
-     * @throws IpboardMemberIdInvalid
-     * @throws IpboardMemberInvalidGroup
-     * @throws IpboardMemberUsernameExists
-     * @throws IpboardMemberEmailExists
      */
     private function request($method, $function, $extra = [])
     {
@@ -159,15 +165,15 @@ class Ipboard
      *
      * All exceptions are dynamically thrown.  Where an exception doesn't exist for an error code, \Exception is thrown.
      *
-     * @param $code The IPBoard error code.
+     * @param ResponseInterface $response The IPBoard error code.
      *
      * @throws \Exception
-     * @throws IpboardInvalidApiKey
-     * @throws IpboardThrottled
-     * @throws IpboardMemberIdInvalid
-     * @throws IpboardMemberInvalidGroup
-     * @throws IpboardMemberUsernameExists
-     * @throws IpboardMemberEmailExists
+     * @throws \Alawrence\Ipboard\Exceptions\IpboardInvalidApiKey
+     * @throws \Alawrence\Ipboard\Exceptions\IpboardThrottled
+     * @throws \Alawrence\Ipboard\Exceptions\IpboardMemberIdInvalid
+     * @throws \Alawrence\Ipboard\Exceptions\IpboardMemberInvalidGroup
+     * @throws \Alawrence\Ipboard\Exceptions\IpboardMemberUsernameExists
+     * @throws \Alawrence\Ipboard\Exceptions\IpboardMemberEmailExists
      */
     private function handleError($response)
     {

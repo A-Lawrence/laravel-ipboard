@@ -2,15 +2,8 @@
 
 namespace Alawrence\Ipboard;
 
-use Alawrence\Ipboard\Exceptions\InvalidFormat;
-use Alawrence\Ipboard\Exceptions\IpboardCannotAuthorFirstPost;
-use Alawrence\Ipboard\Exceptions\IpboardCannotDeleteFirstPost;
-use Alawrence\Ipboard\Exceptions\IpboardCannotHideFirstPost;
-use Alawrence\Ipboard\Exceptions\IpboardForumPostIdInvalid;
-use Alawrence\Ipboard\Exceptions\IpboardForumTopicIdInvalid;
 use Alawrence\Ipboard\Exceptions\IpboardInvalidApiKey;
 use Alawrence\Ipboard\Exceptions\IpboardMemberIdInvalid;
-use Alawrence\Ipboard\Exceptions\IpboardPostInvalid;
 use Alawrence\Ipboard\Exceptions\IpboardThrottled;
 
 trait Posts
@@ -19,12 +12,17 @@ trait Posts
      * Fetch all forum posts that match the given search criteria
      *
      * @param array $searchCriteria The search criteria posts should match.
-     * @param integer $page             The page number to retrieve (default 1).
+     * @param integer $page The page number to retrieve (default 1).
      *
      * @return mixed
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
+     * @throws IpboardMemberIdInvalid
      * @throws IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
+     * @throws Exceptions\InvalidFormat
+     * @throws \Exception
      */
     public function getForumPostsByPage($searchCriteria, $page = 1)
     {
@@ -46,7 +44,7 @@ trait Posts
 
         if ($validator->fails()) {
             $message = head(array_flatten($validator->messages()));
-            throw new InvalidFormat($message);
+            throw new Exceptions\InvalidFormat($message);
         }
 
         return $this->getRequest("forums/posts", array_merge($searchCriteria, ["page" => $page]));
@@ -55,12 +53,17 @@ trait Posts
     /**
      * Fetch all forum posts that match the given search criteria
      *
-     * @param $searchCriteria The search criteria posts should match.
+     * @param array $searchCriteria The search criteria posts should match.
      *
      * @return mixed
+     * @throws Exceptions\InvalidFormat
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
+     * @throws IpboardMemberIdInvalid
      * @throws IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
+     * @throws \Exception
      */
     public function getForumPostsAll($searchCriteria)
     {
@@ -79,12 +82,16 @@ trait Posts
     /**
      * Get a specific forum post given the ID.
      *
-     * @param $postId The ID of the forum post to retrieve.
+     * @param integer $postId The ID of the forum post to retrieve.
      *
      * @return mixed
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
+     * @throws IpboardMemberIdInvalid
      * @throws IpboardThrottled
-     * @throws IpboardForumPostIdInvalid
+     * @throws \Exception
      */
     public function getForumPostById($postId)
     {
@@ -96,16 +103,18 @@ trait Posts
      *
      * @param integer $topicID  The ID of the topic to add the post to.
      * @param integer $authorID The ID of the author for the post (if set to 0, author_name is used)
-     * @param stromg  $post     The HTML content of the post.
-     * @param array   $extra
+     * @param string $post      The HTML content of the post.
+     * @param array $extra
      *
      * @return mixed
+     * @throws Exceptions\InvalidFormat
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
-     * @throws IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
      * @throws IpboardMemberIdInvalid
-     * @throws IpboardForumTopicIdInvalid
-     * @throws IpboardPostInvalid
+     * @throws IpboardThrottled
+     * @throws \Exception
      */
     public function createForumPost($topicID, $authorID, $post, $extra = [])
     {
@@ -124,7 +133,7 @@ trait Posts
 
         if ($validator->fails()) {
             $message = head(array_flatten($validator->messages()));
-            throw new InvalidFormat($message);
+            throw new Exceptions\InvalidFormat($message);
         }
 
         return $this->postRequest("forums/posts", $data);
@@ -133,18 +142,18 @@ trait Posts
     /**
      * Update a forum post with the given ID.
      *
-     * @param integer $postID The ID of the post to update.
-     * @param array   $data   The data to edit.
+     * @param $postId
+     * @param array $data The data to edit.
      *
      * @return mixed
+     * @throws Exceptions\InvalidFormat
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
-     * @throws IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
      * @throws IpboardMemberIdInvalid
-     * @throws IpboardForumPostIdInvalid
-     * @throws IpboardPostInvalid
-     * @throws IpboardCannotHideFirstPost
-     * @throws IpboardCannotAuthorFirstPost
+     * @throws IpboardThrottled
+     * @throws \Exception
      */
     public function updateForumPost($postId, $data = [])
     {
@@ -157,7 +166,7 @@ trait Posts
 
         if ($validator->fails()) {
             $message = head(array_flatten($validator->messages()));
-            throw new InvalidFormat($message);
+            throw new Exceptions\InvalidFormat($message);
         }
 
         return $this->postRequest("forums/posts/" . $postId, $data);
@@ -166,13 +175,16 @@ trait Posts
     /**
      * Delete a forum post given it's ID.
      *
-     * @param $postId The ID of the post to delete.
+     * @param integer $postId The ID of the post to delete.
      *
      * @return mixed
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
+     * @throws IpboardMemberIdInvalid
      * @throws IpboardThrottled
-     * @throws IpboardForumPostIdInvalid
-     * @throws IpboardCannotDeleteFirstPost
+     * @throws \Exception
      */
     public function deleteForumPost($postId)
     {

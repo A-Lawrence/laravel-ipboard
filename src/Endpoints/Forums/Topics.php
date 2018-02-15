@@ -2,16 +2,9 @@
 
 namespace Alawrence\Ipboard;
 
-use Alawrence\Ipboard\Exceptions\InvalidFormat;
-use Alawrence\Ipboard\Exceptions\IpboardCannotDeleteFirstPost;
-use Alawrence\Ipboard\Exceptions\IpboardForumIdInvalid;
-use Alawrence\Ipboard\Exceptions\IpboardForumPostIdInvalid;
-use Alawrence\Ipboard\Exceptions\IpboardForumTopicIdInvalid;
 use Alawrence\Ipboard\Exceptions\IpboardInvalidApiKey;
 use Alawrence\Ipboard\Exceptions\IpboardMemberIdInvalid;
-use Alawrence\Ipboard\Exceptions\IpboardPostInvalid;
 use Alawrence\Ipboard\Exceptions\IpboardThrottled;
-use Alawrence\Ipboard\Exceptions\IpboardTopicTitleInvalid;
 
 trait Topics
 {
@@ -19,12 +12,17 @@ trait Topics
      * Fetch all forum topics that match the given search criteria
      *
      * @param array $searchCriteria The search criteria topics should match.
-     * @param integer  $page           The page number to retrieve (default 1).
+     * @param integer $page The page number to retrieve (default 1).
      *
      * @return mixed
+     * @throws Exceptions\InvalidFormat
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
+     * @throws IpboardMemberIdInvalid
      * @throws IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
+     * @throws \Exception
      */
     public function getForumTopicsByPage($searchCriteria, $page = 1)
     {
@@ -46,7 +44,7 @@ trait Topics
 
         if ($validator->fails()) {
             $message = head(array_flatten($validator->messages()));
-            throw new InvalidFormat($message);
+            throw new Exceptions\InvalidFormat($message);
         }
 
         return $this->getRequest("forums/topics", array_merge($searchCriteria, ["page" => $page]));
@@ -58,9 +56,14 @@ trait Topics
      * @param integer $searchCriteria The search criteria topics should match.
      *
      * @return mixed
+     * @throws Exceptions\InvalidFormat
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
+     * @throws IpboardMemberIdInvalid
      * @throws IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
+     * @throws \Exception
      */
     public function getForumTopicsAll($searchCriteria)
     {
@@ -82,9 +85,13 @@ trait Topics
      * @param integer $topicId The ID of the forum topic to retrieve.
      *
      * @return mixed
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
+     * @throws IpboardMemberIdInvalid
      * @throws IpboardThrottled
-     * @throws IpboardForumTopicIdInvalid
+     * @throws \Exception
      */
     public function getForumTopicById($topicId)
     {
@@ -99,10 +106,14 @@ trait Topics
      * @param integer $page The page number to retrieve (default 1).
      *
      * @return mixed
+     * @throws Exceptions\InvalidFormat
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
+     * @throws IpboardMemberIdInvalid
      * @throws IpboardThrottled
-     * @throws IpboardForumTopicIdInvalid
-     * @throws InvalidFormat
+     * @throws \Exception
      */
     public function getForumTopicPosts($topicId, $searchCriteria = [], $page = 1)
     {
@@ -113,7 +124,7 @@ trait Topics
 
         if ($validator->fails()) {
             $message = head(array_flatten($validator->messages()));
-            throw new InvalidFormat($message);
+            throw new Exceptions\InvalidFormat($message);
         }
 
         return $this->getRequest("forums/topics/" . $topicId . "/posts", array_merge($searchCriteria, ["page" => $page]));
@@ -122,20 +133,21 @@ trait Topics
     /**
      * Create a forum topic with the given data.
      *
-     * @param integer forumID  The ID of the forum to add the topic to.
+     * @param $forumID
      * @param integer $authorID The ID of the author for the topic (if set to 0, author_name is used)
-     * @param string  $title    The title of the topic.
-     * @param string  $post     The HTML content of the post.
-     * @param array   $extra
+     * @param string $title The title of the topic.
+     * @param string $post The HTML content of the post.
+     * @param array $extra
      *
      * @return mixed
+     * @throws Exceptions\InvalidFormat
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
-     * @throws IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
-     * @throws IpboardForumIdInvalid
      * @throws IpboardMemberIdInvalid
-     * @throws IpboardTopicTitleInvalid
-     * @throws IpboardPostInvalid
+     * @throws IpboardThrottled
+     * @throws \Exception
      */
     public function createForumTopic($forumID, $authorID, $title, $post, $extra = [])
     {
@@ -164,7 +176,7 @@ trait Topics
 
         if ($validator->fails()) {
             $message = head(array_flatten($validator->messages()));
-            throw new InvalidFormat($message);
+            throw new Exceptions\InvalidFormat($message);
         }
 
         return $this->postRequest("forums/topics", $data);
@@ -174,15 +186,17 @@ trait Topics
      * Update a forum topic with the given ID.
      *
      * @param integer $topicID The ID of the topic to update.
-     * @param array   $data   The data to edit.
+     * @param array $data The data to edit.
      *
      * @return mixed
+     * @throws Exceptions\InvalidFormat
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
-     * @throws IpboardThrottled
-     * @throws \Alawrence\Ipboard\Exceptions\InvalidFormat
-     * @throws IpboardForumTopicIdInvalid
-     * @throws IpboardForumIdInvalid
      * @throws IpboardMemberIdInvalid
+     * @throws IpboardThrottled
+     * @throws \Exception
      */
     public function updateForumTopic($topicID, $data = [])
     {
@@ -208,7 +222,7 @@ trait Topics
 
         if ($validator->fails()) {
             $message = head(array_flatten($validator->messages()));
-            throw new InvalidFormat($message);
+            throw new Exceptions\InvalidFormat($message);
         }
 
         return $this->postRequest("forums/topics/" . $topicID, $data);
@@ -217,13 +231,16 @@ trait Topics
     /**
      * Delete a forum topic given it's ID.
      *
-     * @param $topicId The ID of the topic to delete.
+     * @param integer $topicId The ID of the topic to delete.
      *
      * @return mixed
+     * @throws Exceptions\IpboardMemberEmailExists
+     * @throws Exceptions\IpboardMemberInvalidGroup
+     * @throws Exceptions\IpboardMemberUsernameExists
      * @throws IpboardInvalidApiKey
+     * @throws IpboardMemberIdInvalid
      * @throws IpboardThrottled
-     * @throws IpboardForumPostIdInvalid
-     * @throws IpboardCannotDeleteFirstPost
+     * @throws \Exception
      */
     public function deleteForumTopic($topicId)
     {
