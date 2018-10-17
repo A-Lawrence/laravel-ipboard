@@ -86,6 +86,8 @@ $allTopics = $ipboard->getForumTopicsAll(); // I would think carefully before do
 
 $singleTopic = $ipboard->getForumTopicById(53); // Get topic ID 53;
 
+$topicPosts = $ipboard->getForumTopicPosts(53, ["sortDir" => "desc"], 2); // Get all 2nd page of posts for a topic ID 53, sorted descending
+
 $newTopic = $ipboard->createForumTopic(2, 2011, "My New Post Title", <p>This is <strong>my</strong> HTML post.</p>"); // Forum 2, author 2011.   Refer to IPBoard API for more data you can provide.
 $newGuestTopic = $ipboard->createForumTopic(2, 0, "My guest title", <p>This is a <em>guest</em> post.</p>", ["author_name" => "My User's Guest Name"]); // Forum 2, author 0 with specified name.   Refer to IPBoard API for more data you can provide.
 
